@@ -22,12 +22,15 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
         tmp_text = node.text
         while tmp_text.count(delimiter) >= 2:
             start_index = tmp_text.index(delimiter)
-            end_index = tmp_text.index(delimiter, start_index + 1)
+            delimiter_length = len(delimiter)
+            end_index = tmp_text.index(delimiter, start_index + delimiter_length)
             before = tmp_text[:start_index]
-            code = tmp_text[start_index + 1:end_index]
-            after = tmp_text[end_index + 1:]
+            code = tmp_text[start_index + delimiter_length:end_index]
+            after = tmp_text[end_index + delimiter_length:]
             if before:
                 new_nodes.append(TextNode(before, node.text_type))
             new_nodes.append(TextNode(code, text_type))
             tmp_text = after
+        if tmp_text:
+            new_nodes.append(TextNode(tmp_text, node.text_type))
     return new_nodes
