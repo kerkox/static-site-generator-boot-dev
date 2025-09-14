@@ -48,3 +48,40 @@ class TestExtractMarkdown(unittest.TestCase):
             ],
             new_nodes,
         )
+    
+    def test_split_links_with_images_nodes(self):
+        nodes = [
+            TextNode("This is an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a [link](https://boot.dev)", TextType.TEXT)
+        ]
+        new_nodes = split_nodes_link(nodes)
+        self.assertListEqual(
+            [
+                TextNode("This is an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINKS, "https://boot.dev"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_combine_with_images(self):
+        node = TextNode(
+            "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode(
+                    "This is **text** with an _italic_ word and a `code block` and an ",
+                    TextType.TEXT,
+                ),
+                TextNode(
+                    "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+                ),
+                TextNode(" and a [link](https://boot.dev)", TextType.TEXT)
+            ],
+            new_nodes,
+        )

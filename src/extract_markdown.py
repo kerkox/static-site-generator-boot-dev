@@ -24,7 +24,7 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
 
     for node in old_nodes:
         text = node.text
-        if text is None:
+        if text is None or node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
 
@@ -45,7 +45,7 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
 
     for node in old_nodes:
         text = node.text
-        if text is None:
+        if text is None or node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
 
