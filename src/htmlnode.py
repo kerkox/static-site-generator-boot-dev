@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Sequence
 
 
-class HTMLNode():
+class HTMLNode:
     """Base de todos los nodos HTML.
 
     Cualquier subclase debe implementar to_html.
