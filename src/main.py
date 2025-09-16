@@ -29,9 +29,9 @@ def generate_page_recursive(content_md: str, template_html: str, output_html: st
             s = os.path.join(content_md, item)
             d = os.path.join(output_html, item.replace('.md', '.html'))
             if os.path.isdir(s):
-                generate_page_recursive(s, template_html, d)
+                generate_page_recursive(s, template_html, d, base_path=base_path)
             elif s.endswith('.md'):
-                generate_page(s, template_html, d, base_path)
+                generate_page(s, template_html, d, base_path=base_path)
     except OSError as e:
         print(f"Error creating directories for {output_html}: {e}")
         return
