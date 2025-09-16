@@ -35,13 +35,15 @@ def block_to_block_type(block: str) -> BlockType:
     else:
         return BlockType.PARAGRAPH
 
-def text_to_children(text: str) -> list[HTMLNode]:
+def text_to_children_li(text: str) -> list[HTMLNode]:
     text_nodes = text_to_text_nodes(text)
     children = []
+
     for text_node in text_nodes:
         child_node = text_node_to_html_node(text_node)
         children.append(child_node)
-    return children
+    li_node = ParentNode("li", children)
+    return [li_node]
 
 def markdown_to_html_node(markdown: str) -> HTMLNode:
     blocks = markdown_to_blocks(markdown)
@@ -53,21 +55,33 @@ def markdown_to_html_node(markdown: str) -> HTMLNode:
         elif block_type == BlockType.CODE:
             block_without_backticks = block.strip('`')
             removed_first_break = block_without_backticks[1:] if block_without_backticks.startswith('\n') else block_without_backticks
-            text_node = TextNode(removed_first_break, text_type=TextType.CODE_TEXT)
+            text_node = TextNode(removed_first_break.replace("\n", "<br/>"), text_type=TextType.CODE_TEXT)
             child_node = text_node_to_html_node(text_node)
             html_node.add_child(ParentNode("pre", children=[child_node]))
         elif block_type == BlockType.QUOTE:
-            html_node.add_child(LeafNode("blockquote", block.strip('> ')))
+            children = []
+            for line in block.split("\n"):
+                if line.strip() == "":
+                    continue
+                children.append(LeafNode(None, line.strip("> ")+"<br/>"))
+            html_node.add_child(ParentNode("blockquote", children=children))
         elif block_type == BlockType.UNORDERED_LIST:
-            ul_node = ParentNode("ul")
-            for item in block.split("\n"):
-                ul_node.add_child(LeafNode("li", item.strip('- ')))
+            children_all = []
+            for line in block.split("- "):
+                if line.strip() == "":
+                    continue
+                children = text_to_children_li(line)
+                children_all.extend(children)
+            ul_node = ParentNode("ul", children=children_all)
             html_node.add_child(ul_node)
         elif block_type == BlockType.ORDERED_LIST:
-            ol_node = ParentNode("ol")
-            for item in block.split("\n"):
-                text = re.search(r"^\d+\.\s+(.*)", item)
-                ol_node.add_child(LeafNode("li", text.group(1) if text else item))
+            children_all = []
+            for line in block.split("\n"):
+                if line.strip() == "":
+                    continue
+                children = text_to_children_li(line.replace(re.match(r"^\d+\.\s+", line).group(0), ""))
+                children_all.extend(children)
+            ol_node = ParentNode("ol", children=children_all)
             html_node.add_child(ol_node)
         else:
             text_nodes = text_to_text_nodes(block)

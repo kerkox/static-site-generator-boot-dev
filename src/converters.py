@@ -4,6 +4,7 @@ from leafnode import LeafNode
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     if not isinstance(text_node.text_type, TextType):
         raise Exception(f"Invalid TextType: {text_node.text_type}")
+    text_node.text = text_node.text.replace("\n", "")
     match text_node.text_type:
         case TextType.TEXT:
             return LeafNode(None, text_node.text)

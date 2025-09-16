@@ -95,6 +95,49 @@ the **same** even with inline stuff
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
-            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+            "<div><pre><code>This is text that _should_ remain<br/>the **same** even with inline stuff<br/></code></pre></div>",
+            html,
+        )
+
+    def test_unordered_list(self):
+        md = """
+- Item 1 [link](http://example.com)
+- Item 2 `code()`
+- Item 3 `more_code()`
+- Item 4 **bold**
+- Item 5 _italic_
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            "<div><ul><li>Item 1 <a href=\"http://example.com\">link</a></li><li>Item 2 <code>code()</code></li><li>Item 3 <code>more_code()</code></li><li>Item 4 <b>bold</b></li><li>Item 5 <i>italic</i></li></ul></div>",
+            html,
+        )
+
+    def test_multiline_code(self):
+        md ="""
+```
+func main(){
+    fmt.Println("Aiya, Ambar!")
+}
+```
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            "<div><pre><code>func main(){<br/>    fmt.Println(\"Aiya, Ambar!\")<br/>}<br/></code></pre></div>",
+            html,
+        )
+
+    def test_multiline_quote(self):
+        md ="""
+> This is a quote
+> that spans multiple lines
+> and should be part of the quote.
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            "<div><blockquote>This is a quote<br/>that spans multiple lines<br/>and should be part of the quote.<br/></blockquote></div>",
             html,
         )

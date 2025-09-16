@@ -1,12 +1,19 @@
 import shutil
 import os
 
+from generate_page import generate_page
+
 PUBLIC_DIR = "public"
 STATIC_DIR = "static"
+
+CONTENT_MARKDOWN = "content/index.md"
+TEMPLATE_HTML = "template.html"
+OUTPUT_HTML = os.path.join(PUBLIC_DIR, "index.html")
 
 def main():
   clean_public_dir()
   copy_static_files_to_public_dir()
+  generate_page(CONTENT_MARKDOWN, TEMPLATE_HTML, OUTPUT_HTML)
 
 
 def copy_static_files_to_public_dir():
