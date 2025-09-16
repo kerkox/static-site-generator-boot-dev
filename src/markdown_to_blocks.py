@@ -1,3 +1,4 @@
+from pydoc import text
 import re
 
 from block_type import BlockType
@@ -45,13 +46,23 @@ def text_to_children_li(text: str) -> list[HTMLNode]:
     li_node = ParentNode("li", children)
     return [li_node]
 
+def text_to_children(text: str) -> list[HTMLNode]:
+    text_nodes = text_to_text_nodes(text)
+    children = []
+
+    for text_node in text_nodes:
+        child_node = text_node_to_html_node(text_node)
+        children.append(child_node)
+    return children
+
 def markdown_to_html_node(markdown: str) -> HTMLNode:
     blocks = markdown_to_blocks(markdown)
     html_node = ParentNode("div")
     for block in blocks:
         block_type = block_to_block_type(block)
         if block_type == BlockType.HEADING:
-            html_node.add_child(LeafNode(f"h{block.count('#')}", block.strip('# ').strip()))
+            children = text_to_children(block.strip('# ').strip())
+            html_node.add_child(ParentNode(f"h{block.count('#')}", children=children))
         elif block_type == BlockType.CODE:
             block_without_backticks = block.strip('`')
             removed_first_break = block_without_backticks[1:] if block_without_backticks.startswith('\n') else block_without_backticks
