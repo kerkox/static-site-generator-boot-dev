@@ -6,15 +6,32 @@ from generate_page import generate_page
 PUBLIC_DIR = "public"
 STATIC_DIR = "static"
 
-CONTENT_MARKDOWN = "content/index.md"
+CONTENT_MARKDOWN = "content"
 TEMPLATE_HTML = "template.html"
-OUTPUT_HTML = os.path.join(PUBLIC_DIR, "index.html")
+OUTPUT_HTML = PUBLIC_DIR
 
 def main():
   clean_public_dir()
   copy_static_files_to_public_dir()
-  generate_page(CONTENT_MARKDOWN, TEMPLATE_HTML, OUTPUT_HTML)
+  generate_page_from_markdown(CONTENT_MARKDOWN, TEMPLATE_HTML, OUTPUT_HTML)
 
+def generate_page_from_markdown(content_md: str, template_html: str, output_html: str):
+    if not os.path.exists(content_md):
+        print(f"Content markdown file {content_md} does not exist.")
+        return
+    try:
+        if not os.path.exists(output_html):
+            os.makedirs(output_html)
+        for item in os.listdir(content_md):
+            s = os.path.join(content_md, item)
+            d = os.path.join(output_html, item.replace('.md', '.html'))
+            if os.path.isdir(s):
+                generate_page_from_markdown(s, template_html, d)
+            elif s.endswith('.md'):
+                generate_page(s, template_html, d)
+    except OSError as e:
+        print(f"Error creating directories for {output_html}: {e}")
+        return
 
 def copy_static_files_to_public_dir():
     if not os.path.exists(STATIC_DIR):
